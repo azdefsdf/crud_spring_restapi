@@ -4,8 +4,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.spring.test.model.Employee;
+import java.util.List;
 
 @Repository
-public interface EmployeeRespositroy extends JpaRepository<Employee, Long>{
+public interface EmployeeRespositroy extends JpaRepository<Employee, Long> {
+
+	// Recherche par nom
+	List<Employee> findByFirstNameContainingIgnoreCase(String name);
+
+	// Recherche par email
+	List<Employee> findByEmailIdContainingIgnoreCase(String email);
+
+	// Recherche par id
+	Employee findById(long id);
+
+	// Vous pouvez également ajouter d'autres méthodes de recherche si nécessaire
 
 }
