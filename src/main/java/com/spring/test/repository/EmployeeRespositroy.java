@@ -9,11 +9,6 @@ import java.util.List;
 @Repository
 public interface EmployeeRespositroy extends JpaRepository<Employee, Long> {
 
-	// Recherche par nom
-	List<Employee> findByFirstNameContainingIgnoreCase(String name);
-
-	// Recherche par email
-	List<Employee> findByEmailIdContainingIgnoreCase(String email);
 
 	// Recherche par id
 	Employee findById(long id);
