@@ -1,4 +1,4 @@
-package exception;
+package com.spring.test.exception;
 
 
 @SuppressWarnings("serial")

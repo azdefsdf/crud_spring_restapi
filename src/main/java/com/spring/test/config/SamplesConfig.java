@@ -1,4 +1,4 @@
-package config;
+package com.spring.test.config;
 
 
 

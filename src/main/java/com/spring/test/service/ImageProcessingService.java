@@ -1,4 +1,4 @@
-package service;
+package com.spring.test.service;
 
 
 import java.io.ByteArrayOutputStream;
@@ -30,18 +30,19 @@ import com.aspose.imaging.fileformats.tiff.TiffImage;
 import com.aspose.imaging.imageoptions.PdfOptions;
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
-
-import config.SamplesConfig;
-import exception.ImageProcessingException;
+import com.spring.test.config.SamplesConfig;
+import com.spring.test.exception.ImageProcessingException;
 
 @Service
 public class ImageProcessingService {
 
+    private String renamedJsonFilename; // Member variable to store the renamed filename
+
+    
 	public String processImagesAndGetJsonData(MultipartFile images, String projectPath)
 			throws ImageProcessingException {
 		IEngine engine = null;
 		String jsonData = null;
-		String jsonData1 = null;
 
 		try {
 
@@ -80,19 +81,11 @@ public class ImageProcessingService {
 
 			try {
 				// Adding images to the batch
-				trace("Adding images...");
-				
-				
+				trace("Adding images...");			
 				// Assuming images is now just a single MultipartFile
 				MultipartFile image = images;
-
 				// Convert MultipartFile to File
 				File imageFile = convertMultipartFileToFile(image);
-				
-				// Print path and name of the file
-				System.out.println(imageFile.getPath());
-				System.out.println(imageFile.getName());
-
 				// Add image to batch processing
 				batch.AddImage(imageFile.getPath());
 
@@ -108,8 +101,8 @@ public class ImageProcessingService {
 				fileExportParamsJSON.setFileFormat(FileExportFormatEnum.FEF_JSON); // Adjust as needed
 				project.Export(null, exportParamsJSON);
 
-				jsonData1 = renameFile();
-				jsonData = readFileAsStringAndDelete(jsonData1);
+				renamedJsonFilename  = renameFile();
+				jsonData = readFileAsStringAndDelete(renamedJsonFilename );
 
 				trace("Export done successfully.");
 			} catch (Exception ex) {
@@ -289,5 +282,24 @@ public class ImageProcessingService {
 			return b64;
 		}
 	}
+
+	public String getJsonFileName() throws Exception {
+	    if (renamedJsonFilename == null) {
+	        throw new Exception("No renamed filename available"); // Handle missing filename
+	    }
+	    
+	    // Extract the filename from the full path
+	    File file = new File(renamedJsonFilename);
+	    String filenameWithoutExtension = file.getName();
+	    
+	    // Remove the ".json" extension (if present)
+	    int dotPos = filenameWithoutExtension.lastIndexOf('.');
+	    if (dotPos > 0) {
+	        filenameWithoutExtension = filenameWithoutExtension.substring(0, dotPos);
+	    }
+	    
+	    return filenameWithoutExtension;
+	}
+
 
 }

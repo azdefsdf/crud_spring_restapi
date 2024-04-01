@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.test.exception.ImageProcessingException;
 import com.spring.test.model.Employee;
 import com.spring.test.repository.EmployeeRespositroy;
-
-import exception.ImageProcessingException;
-import service.ImageProcessingService;
+import com.spring.test.service.ImageProcessingService;
 
 @CrossOrigin("http://localhost:4200")
 @RestController
@@ -40,25 +39,23 @@ public class EmployeeController {
 	}
 
 	
-	// creat a rest api for employee
+	// send data to database
 	@PostMapping("/invoices")
 	public Employee creatEmployee(@RequestBody Employee employee) {
 		return employeeRepository.save(employee);
 	}
 	
 
+	//processing image to json file and read it 
 	@PostMapping("/data")
 	public ResponseEntity<?> fetchAbbyyData(@RequestParam("images") MultipartFile images,
 			@RequestParam("projectPath") String projectPath) {
 
 
-		
-
 			try {
 				
 				String jsonData = imageProcessingService.processImagesAndGetJsonData(images, projectPath);
-
-
+				
 					return ResponseEntity.ok(jsonData);
 				
 			} catch (ImageProcessingException ex) {
@@ -71,7 +68,7 @@ public class EmployeeController {
 	}
 	
 	
-	
+	//convert image to pdf
 	@PostMapping("/pdf")
 	public ResponseEntity<?> fetchAbbyyDataPdf(@RequestParam("images") MultipartFile images) {
 	    try {
@@ -79,11 +76,12 @@ public class EmployeeController {
 	        String base = imageProcessingService.convertTIFFtoPDF(images);
 	        String base64 = imageProcessingService.convertPdfToBase64(base);
 	        
-	        
+	        String jsonFileName = imageProcessingService.getJsonFileName(); // Call a new method to get the filename
+
 	        // Create a JSON object with the required structure
 	        JSONObject jsonResponse = new JSONObject();
 	        jsonResponse.put("pdfData", base64);
-	        
+	        jsonResponse.put("filename", jsonFileName);
 	        
 	        return ResponseEntity.ok(jsonResponse.toString());
 	    } catch (ImageProcessingException ex) {
