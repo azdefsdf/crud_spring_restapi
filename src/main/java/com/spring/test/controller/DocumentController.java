@@ -46,29 +46,20 @@ public class DocumentController {
         Document savedDocument = documentService.saveDocument(document);
         return ResponseEntity.ok(savedDocument);
     }
-	// send data to database
-	//@PostMapping("/validate")
-	//public Document creatEmployee(@RequestBody Document document) {
-	//	return documentRepository.save(document);
-	//}
-	
-	
-	
- // Endpoint to validate a document
-    @PostMapping("/validate/{documentId}")
-    public void validateDocument(@PathVariable String documentId) {
-        documentService.validateDocument(documentId);
-    }
 
-    // Endpoint to reject a document
-    @PostMapping("/reject/{documentId}")
-    public void rejectDocument(@PathVariable Long documentId) {
-        documentService.rejectDocument(documentId);
+    // Endpoint to fetch completed documents
+    @GetMapping("/completed")
+    public List<Document> getCompletedDocuments() {
+        return documentService.getCompletedDocuments();
     }
     
-    
-    
-    
+    // Endpoint to fetch completed documents
+    @GetMapping("/waiting")
+    public List<Document> getWaitingDocuments() {
+        return documentService.getWaitingDocuments();
+    }
+	
+
     
     
     @GetMapping
