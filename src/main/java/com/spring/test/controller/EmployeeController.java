@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,16 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.test.exception.ImageProcessingException;
+import com.spring.test.excpetion.ResourceNotFoundException;
 import com.spring.test.model.Employee;
 import com.spring.test.repository.EmployeeRespositroy;
 import com.spring.test.service.ImageProcessingService;
 
 @CrossOrigin("http://localhost:4200")
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
 public class EmployeeController {
 
-	@Autowired(required = false)
+	@Autowired
 	private  EmployeeRespositroy employeeRepository ;
 
 
@@ -45,6 +48,24 @@ public class EmployeeController {
 		return employeeRepository.save(employee);
 	}
 	
+	
+	// Controller
+	@PutMapping("/invoices/{id}")
+	public ResponseEntity<Employee> updateInvoice(@PathVariable Long id, @RequestBody Employee invoice) {
+		Employee existingInvoice = employeeRepository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
+	    // Update existingInvoice with new data from the request body
+	    existingInvoice.setInvoiceNumber(invoice.getInvoiceNumber());
+	    existingInvoice.setInvoiceDate(invoice.getInvoiceDate());
+	    existingInvoice.setCompany(invoice.getCompany());
+	    existingInvoice.setTotalAmount(invoice.getTotalAmount());
+	    existingInvoice.setDeliveryAddress(invoice.getDeliveryAddress());
+	    // Update other fields similarly
+
+	    Employee updatedInvoice = employeeRepository.save(existingInvoice);
+	    return ResponseEntity.ok(updatedInvoice);
+	}
+
 
 	//processing image to json file and read it 
 	@PostMapping("/data")

@@ -1,6 +1,5 @@
 package com.spring.test.service;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,9 +35,10 @@ import com.spring.test.exception.ImageProcessingException;
 @Service
 public class ImageProcessingService {
 
-    private String renamedJsonFilename; // Member variable to store the renamed filename
+	// Member variable to store the renamed filename
+	String renamedJsonFilename;
+	String renamedFilename = UUID.randomUUID().toString();
 
-    
 	public String processImagesAndGetJsonData(MultipartFile images, String projectPath)
 			throws ImageProcessingException {
 		IEngine engine = null;
@@ -80,12 +80,14 @@ public class ImageProcessingService {
 			batch.Open();
 
 			try {
+
 				// Adding images to the batch
-				trace("Adding images...");			
+				trace("Adding images...");
 				// Assuming images is now just a single MultipartFile
 				MultipartFile image = images;
 				// Convert MultipartFile to File
 				File imageFile = convertMultipartFileToFile(image);
+
 				// Add image to batch processing
 				batch.AddImage(imageFile.getPath());
 
@@ -101,8 +103,8 @@ public class ImageProcessingService {
 				fileExportParamsJSON.setFileFormat(FileExportFormatEnum.FEF_JSON); // Adjust as needed
 				project.Export(null, exportParamsJSON);
 
-				renamedJsonFilename  = renameFile();
-				jsonData = readFileAsStringAndDelete(renamedJsonFilename );
+				renamedJsonFilename = renameFile();
+				jsonData = readFileAsStringAndDelete(renamedJsonFilename);
 
 				trace("Export done successfully.");
 			} catch (Exception ex) {
@@ -143,16 +145,17 @@ public class ImageProcessingService {
 
 	public static File convertMultipartFileToFile(MultipartFile multipartFile) throws Exception {
 		String originalFilename = multipartFile.getOriginalFilename();
-		String filePath = "C:\\ProgramData\\ABBYY\\FCSDK\\12\\FlexiCapture SDK\\Samples\\SampleProjects\\Hello\\SampleProject\\saved\\"+ originalFilename;
+		String filePath = "C:\\ProgramData\\ABBYY\\FCSDK\\12\\FlexiCapture SDK\\Samples\\SampleProjects\\Hello\\SampleProject\\saved\\"
+				+ originalFilename;
 		File file = new File(filePath);
 		multipartFile.transferTo(file);
 		return file;
 	}
 
-	private static String renameFile() throws Exception {
+	private String renameFile() throws Exception {
 
 		String samplesFolder = SamplesConfig.GetSamplesFolder();
-		String customFileName = UUID.randomUUID().toString() + ".json";
+		String customFileName = renamedFilename + ".json";
 
 		// Construct the path to the exported JSON file
 		String exportedFilePath = combinePaths(samplesFolder,
@@ -192,55 +195,59 @@ public class ImageProcessingService {
 		return fileContent;
 	}
 
-	
-	
 	public String convertTIFFtoPDF(MultipartFile images) throws Exception {
-	    MultipartFile image = images;
+		MultipartFile image = images;
+		File imageFile = convertMultipartFileToFile(image);
 
-	    File imageFile = convertMultipartFileToFile(image);
+		// Extract file name and parent folder
+		String fileName = imageFile.getName();
+		String parentFolderPath = imageFile.getParentFile().getPath();
 
-	    // Extract file name and parent folder
-	    String fileName = imageFile.getName();
-	    String parentFolderPath = imageFile.getParentFile().getPath();
+		// Create a new folder for PDF conversion
+		String pdfConvertFolderPath = parentFolderPath + File.separator + "PdfConvert";
+		File pdfConvertFolder = new File(pdfConvertFolderPath);
+		if (!pdfConvertFolder.exists()) {
+			pdfConvertFolder.mkdirs(); // Create the folder if it doesn't exist
+		}
 
-	    // Create a new folder for PDF conversion
-	    String pdfConvertFolderPath = parentFolderPath + File.separator + "PdfConvert";
-	    File pdfConvertFolder = new File(pdfConvertFolderPath);
-	    if (!pdfConvertFolder.exists()) {
-	        pdfConvertFolder.mkdirs(); // Create the folder if it doesn't exist
-	    }
+		// Load the TIFF image
+		InputStream inputStream = new FileInputStream(imageFile);
+		TiffImage tiffImage = (TiffImage) Image.load(inputStream);
 
-	    // Load the TIFF image
-	    InputStream inputStream = new FileInputStream(imageFile);
-	    TiffImage tiffImage = (TiffImage) Image.load(inputStream);
+		// Create PDF options
+		PdfOptions pdfOptions = new PdfOptions();
 
-	    // Create PDF options
-	    PdfOptions pdfOptions = new PdfOptions();
+		// Save the TIFF image as a PDF
+		File outputPdfFile = new File(pdfConvertFolderPath, fileName.replaceFirst("[.][^.]+$", "") + ".pdf");
+		FileOutputStream outputStream = new FileOutputStream(outputPdfFile);
+		tiffImage.save(outputStream, pdfOptions);
+		outputStream.close();
 
-	    // Save the TIFF image as a PDF
-	    File outputPdfFile = new File(pdfConvertFolderPath, fileName.replaceFirst("[.][^.]+$", "") + ".pdf");
-	    FileOutputStream outputStream = new FileOutputStream(outputPdfFile);
-	    tiffImage.save(outputStream, pdfOptions);
-	    outputStream.close();
-
-	    // Close the input stream
-	    inputStream.close();
-		System.out.println("PDF created successfully at: " + outputPdfFile.getAbsolutePath());
+		// Rename the pdf file
+		File renamedPdfFile = new File(outputPdfFile.getParent(), renamedFilename + ".pdf");
+		if (outputPdfFile.renameTo(renamedPdfFile)) {
+			trace("Pdf renamed successfully to :" + renamedFilename + ".pdf");
+		} else {
+			trace("Failed to rename Pdf.");
+		}
+		// Close the input stream
+		inputStream.close();
+		System.out.println("PDF created successfully at: " + renamedPdfFile.getAbsolutePath());
 		trace("====================");
 		trace("The End ! ");
 		trace("====================");
-	    // Return the file path of the generated PDF file
-	    return outputPdfFile.getAbsolutePath();
+		// Reset renamedFilename to null
+		renamedFilename =UUID.randomUUID().toString();
+		// Return the file path of the generated PDF file
+		return renamedPdfFile.getAbsolutePath();
 	}
-	
-	
-	
+
 	public String convertImageToPdf(MultipartFile images) throws Exception {
 
 		MultipartFile image = images;
 
 		File imageFile = convertMultipartFileToFile(image);
-		
+
 		// Extract file name and parent folder
 		String fileName = imageFile.getName();
 		String parentFolderPath = imageFile.getParentFile().getPath(); // Using getPath()
@@ -284,22 +291,21 @@ public class ImageProcessingService {
 	}
 
 	public String getJsonFileName() throws Exception {
-	    if (renamedJsonFilename == null) {
-	        throw new Exception("No renamed filename available"); // Handle missing filename
-	    }
-	    
-	    // Extract the filename from the full path
-	    File file = new File(renamedJsonFilename);
-	    String filenameWithoutExtension = file.getName();
-	    
-	    // Remove the ".json" extension (if present)
-	    int dotPos = filenameWithoutExtension.lastIndexOf('.');
-	    if (dotPos > 0) {
-	        filenameWithoutExtension = filenameWithoutExtension.substring(0, dotPos);
-	    }
-	    
-	    return filenameWithoutExtension;
-	}
+		if (renamedJsonFilename == null) {
+			throw new Exception("No renamed filename available"); // Handle missing filename
+		}
 
+		// Extract the filename from the full path
+		File file = new File(renamedJsonFilename);
+		String filenameWithoutExtension = file.getName();
+
+		// Remove the ".json" extension (if present)
+		int dotPos = filenameWithoutExtension.lastIndexOf('.');
+		if (dotPos > 0) {
+			filenameWithoutExtension = filenameWithoutExtension.substring(0, dotPos);
+		}
+
+		return filenameWithoutExtension;
+	}
 
 }
