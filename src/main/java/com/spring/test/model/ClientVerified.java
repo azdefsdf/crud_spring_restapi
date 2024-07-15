@@ -1,8 +1,6 @@
 package com.spring.test.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,24 +12,25 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @ConfigurationProperties(prefix = "file")
 @Component
-@Table(name="client")
-public class Client implements Serializable {
-    @Id
+@Table(name="client_final")
+public class ClientVerified implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nom;
     private String prenom;
     
-    @Column(name = "shared_id", unique = true)
+    @Column(name = "shared_id", unique = true, insertable = false, updatable = false)
     private String sharedId;
     
     @DateTimeFormat(pattern = "dd MMM yyyy")
@@ -43,19 +42,14 @@ public class Client implements Serializable {
     private String sex;
     private String numeroPasseport;
     private String pays;
-    @Lob
-    private byte[] file;
-    @Column(name = "upload_dir")
-    private String uploadDir;
 
     @OneToOne
-    @JoinColumn(name="client_verified_id")
-    private ClientVerified clientverified;
+    @JoinColumn(name = "shared_id", referencedColumnName = "shared_id")
+    private Client client;
 
 
-
-	public Client(long id, String nom, String prenom, String sharedId, String dateDelivre, String dateExpiration,
-			String dateNaissance, String sex, String numeroPasseport, String pays, byte[] file, String uploadDir) {
+	public ClientVerified(long id, String nom, String prenom, String sharedId, String dateDelivre, String dateExpiration,
+			String dateNaissance, String sex, String numeroPasseport, String pays) {
 		super();
 		this.id = id;
 		this.nom = nom;
@@ -67,12 +61,8 @@ public class Client implements Serializable {
 		this.sex = sex;
 		this.numeroPasseport = numeroPasseport;
 		this.pays = pays;
-		this.file = file;
-		this.uploadDir = uploadDir;
 	}
 	
-	
-
 
 	public void setId(long id) {
 		this.id = id;
@@ -89,25 +79,9 @@ public class Client implements Serializable {
 		this.sharedId = sharedId;
 	}
 
-	public byte[] getFile() {
-		return file;
-	}
 
 
-	public void setFile(byte[] file) {
-		this.file = file;
-	}
-
-	public String getUploadDir() {
-		return uploadDir;
-	}
-
-	public void setUploadDir(String uploadDir) {
-		this.uploadDir = uploadDir;
-	}
-
-
-	public Client() {
+	public ClientVerified() {
 		super();
 		// TODO Auto-generated constructor stub
 	}

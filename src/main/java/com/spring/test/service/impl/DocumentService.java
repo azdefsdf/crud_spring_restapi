@@ -51,6 +51,7 @@ public class DocumentService implements DocumentServices {
 	public String convertPdfToBase64(String pdfPath) throws Exception {
 
 		File file = new File(pdfPath);
+		
 
 		try (InputStream inputStream = Files.newInputStream(file.toPath())) {
 			byte[] bytes = inputStream.readAllBytes();
@@ -128,6 +129,10 @@ public class DocumentService implements DocumentServices {
 		}
     }
 	
+    
+    
+    
+    
     
 	// Methods for CRUD operations
 	public List<Document> getAllDocuments() {

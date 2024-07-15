@@ -125,10 +125,10 @@ public class DocumentController {
 	
 	
 	
-	@GetMapping
-	public List<Document> getAllDocuments() {
-		return documentService.getAllDocuments();
-	}
+	//@GetMapping
+//	public List<Document> getAllDocuments() {
+	//	return documentService.getAllDocuments();
+	//}
 
 	@GetMapping("/{id}")
 	public Document getDocumentById(@PathVariable Long id) {

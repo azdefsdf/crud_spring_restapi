@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 
@@ -32,6 +34,9 @@ public class Document {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    
+ 
+    
     // Constructor
     public Document() {
         // Initialize createdAt and updatedAt with the current date and time
@@ -39,6 +44,7 @@ public class Document {
       //  this.updatedAt = new Date();
     }
     
+
 
 	public Document(Long id, String documentId, String status, String userId, Date createdAt, Date updatedAt) {
 		super();
@@ -50,6 +56,10 @@ public class Document {
 		this.updatedAt = updatedAt;
 	}
 
+
+
+	
+	
 	public Long getId() {
 		return id;
 	}

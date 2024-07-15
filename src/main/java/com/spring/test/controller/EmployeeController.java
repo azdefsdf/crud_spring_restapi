@@ -16,7 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.test.exception.ImageProcessingException;
 import com.spring.test.excpetion.ResourceNotFoundException;
-import com.spring.test.model.Employee;
+import com.spring.test.model.Client;
+import com.spring.test.model.ClientVerified;
 import com.spring.test.repository.EmployeeRespositroy;
 import com.spring.test.service.ImageProcessingService;
 
@@ -28,7 +29,7 @@ public class EmployeeController {
 	@Autowired
 	private  EmployeeRespositroy employeeRepository ;
 
-
+	
 	private final ImageProcessingService imageProcessingService;
 
 	public EmployeeController() {
@@ -39,30 +40,40 @@ public class EmployeeController {
 
 	public EmployeeController(ImageProcessingService imageProcessingService) {
 		this.imageProcessingService = imageProcessingService;
+		
 	}
 
 	
 	// send data to database
 	@PostMapping("/invoices")
-	public Employee creatEmployee(@RequestBody Employee employee) {
-		return employeeRepository.save(employee);
+	public ClientVerified creatEmployee(@RequestBody ClientVerified client) {
+		return employeeRepository.save(client);
 	}
 	
 	
 	// Controller
 	@PutMapping("/invoices/{id}")
-	public ResponseEntity<Employee> updateInvoice(@PathVariable Long id, @RequestBody Employee invoice) {
-		Employee existingInvoice = employeeRepository.findById(id)
+	public ResponseEntity<ClientVerified> updateInvoice(@PathVariable Long id, @RequestBody ClientVerified invoice) {
+		ClientVerified existingInvoice = employeeRepository.findById(id)
 	            .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with id: " + id));
 	    // Update existingInvoice with new data from the request body
-	    existingInvoice.setInvoiceNumber(invoice.getInvoiceNumber());
+		 /* existingInvoice.setInvoiceNumber(invoice.getInvoiceNumber());
 	    existingInvoice.setInvoiceDate(invoice.getInvoiceDate());
 	    existingInvoice.setCompany(invoice.getCompany());
 	    existingInvoice.setTotalAmount(invoice.getTotalAmount());
 	    existingInvoice.setDeliveryAddress(invoice.getDeliveryAddress());
 	    // Update other fields similarly
-
-	    Employee updatedInvoice = employeeRepository.save(existingInvoice);
+	    */
+		 existingInvoice.setNom(invoice.getNom());
+		 existingInvoice.setPrenom(invoice.getPrenom());
+		 existingInvoice.setSex(invoice.getSex());
+		 existingInvoice.setDateNaissance(invoice.getDateNaissance());
+		 existingInvoice.setDateDelivre(invoice.getDateDelivre());
+		 existingInvoice.setDateExpiration(invoice.getDateExpiration());
+		 existingInvoice.setPays(invoice.getPays());
+		 existingInvoice.setNumeroPasseport(invoice.getNumeroPasseport());
+		
+		 ClientVerified updatedInvoice = employeeRepository.save(existingInvoice);
 	    return ResponseEntity.ok(updatedInvoice);
 	}
 
@@ -114,5 +125,10 @@ public class EmployeeController {
 	    }
 	}
 
+	
+
+
+	
 
 }
+	  

@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf->csrf.disable())
                 .headers(h->h.frameOptions(fo->fo.disable()))
-                .authorizeHttpRequests(ar->ar.requestMatchers("/h2-console/**","/api/v1/documents/**","/api/v1/**", "/api/v1/invoices/**").permitAll())
+                .authorizeHttpRequests(ar->ar.requestMatchers("/h2-console/**","/api/v1/documents/**","/api/v1/**","/api/v1/pdf", "/api/v1/invoices/**").permitAll())
                // .authorizeHttpRequests(ar->ar.requestMatchers("/api/v1/documents/waiting").hasAuthority("ADMIN"))
                // .authorizeHttpRequests(ar->ar.requestMatchers("/api/v1/documents/completed","/api/v1/auth").hasAuthority("ADMIN"))
               //  .authorizeHttpRequests(ar->ar.requestMatchers("/api/v1/documents/**").hasAuthority("USER")) 

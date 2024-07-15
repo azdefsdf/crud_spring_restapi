@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,10 +32,16 @@ import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
 import com.spring.test.config.SamplesConfig;
 import com.spring.test.exception.ImageProcessingException;
+import com.spring.test.excpetion.ResourceNotFoundException;
+import com.spring.test.model.Client;
+import com.spring.test.model.ClientVerified;
+import com.spring.test.repository.EmployeeRespositroy;
 
 @Service
 public class ImageProcessingService {
 
+	@Autowired
+	private EmployeeRespositroy employeeRespositroy;
 	// Member variable to store the renamed filename
 	String renamedJsonFilename;
 	String renamedFilename = UUID.randomUUID().toString();
@@ -128,6 +135,8 @@ public class ImageProcessingService {
 			trace(" waiting For PDF Converter ... ");
 
 			trace("==================================");
+			// Reset renamedFilename to null
+
 		}
 
 		return jsonData;
@@ -194,6 +203,7 @@ public class ImageProcessingService {
 
 		return fileContent;
 	}
+
 
 	public String convertTIFFtoPDF(MultipartFile images) throws Exception {
 		MultipartFile image = images;
@@ -307,5 +317,8 @@ public class ImageProcessingService {
 
 		return filenameWithoutExtension;
 	}
-
+    public ClientVerified findClientById(Long id) {
+        return employeeRespositroy.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Client not found with id " + id));
+    }
 }
